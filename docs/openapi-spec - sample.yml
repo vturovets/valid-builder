@@ -1,0 +1,99 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0-oas3
+  title: xyz NGS Product and Price Search API for Package Holidays
+  description: >
+    xyz NGS Product & Price Search Service provides the API specification for
+    fetching the package product offers & includes prices for a requested
+    location or hotels.
+servers:
+  - url: 'http://127.0.0.1:8092'
+    description: Local development
+paths:
+  /v3/package/search/results:
+    post:
+      description: |
+        Retrieve list of Package items and facets with cheapest price offer.
+        Follows the standards for parameters from the
+        Note - filters are yet to be defined
+      requestBody:
+        content:
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/PackageSearchRequestParams"
+            }
+          }
+        required: true
+      parameters:
+        - name: "X-trace-id"
+          in: header
+          required: true
+          description: End to end tracing ID
+          schema:
+            type: string
+            default: none
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackageSearchResponse'
+        '404':
+          description: custom error
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    PackageSearchRequestParams:
+      description: Product price search Abstract request V3.
+      type: object
+      required:
+        - from
+      properties:
+        from:
+          type: array
+          items:
+            $ref: '#/components/schemas/From'
+    PackageSearchResponse:
+      title: SearchResultResponseV3
+      required:
+        - holidays
+      type: object
+      properties:
+        holidays:
+          $ref: '#/components/schemas/Holidays'
+    From:
+      type: "object"
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          description: Departure Code
+          example: BRU
+        type:
+          type: string
+          enum: [ "AIRPORT" ]
+
+    Holidays:
+      title: Holidays
+      required:
+        - offers
+      type: object
+      properties:
+        offers:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Offer'
+    Offer:
+      title: Offer
+      required:
+        - productID
+      type: object
+      properties:
+        productID:
+          type: string
+          example: 748f6b96-a99a-4a3e-bd50-1b4b9c9fa7ac
