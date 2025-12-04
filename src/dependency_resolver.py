@@ -58,7 +58,12 @@ def _warn_on_cycles(
             if cycle_key not in cycles_logged:
                 cycles_logged.add(cycle_key)
                 rule_ids = [internal_id_map[n].rule_id for n in cycle_nodes if internal_id_map[n].rule_id]
-                logger.warning("Detected dependency cycle: %s", " -> ".join(rule_ids))
+                previous_propagate = logger.propagate
+                try:
+                    logger.propagate = True
+                    logger.warning("Detected dependency cycle: %s", " -> ".join(rule_ids))
+                finally:
+                    logger.propagate = previous_propagate
             return
         if visited.get(node) == "visited":
             return
