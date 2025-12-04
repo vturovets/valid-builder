@@ -7,6 +7,8 @@ import tempfile
 from pathlib import Path
 from typing import Iterable
 
+from .models import sort_rules
+
 
 CSV_HEADERS = [
     "Rule ID",
@@ -45,7 +47,13 @@ def write_rules_csv(output_path: Path | str, rules: Iterable[object]) -> None:
             writer.writerow(CSV_HEADERS)
 
             row_count = 0
-            for rule in rules:
+            rules_list = list(rules)
+            try:
+                ordered_rules = sort_rules(rules_list)
+            except AttributeError:
+                ordered_rules = rules_list
+
+            for rule in ordered_rules:
                 writer.writerow(_serialize_rule(rule))
                 row_count += 1
 
