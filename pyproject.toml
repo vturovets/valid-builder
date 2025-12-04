@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valid-builder"
+version = "0.1.0"
+description = "CLI tool that extracts validation rules from Kotlin or OpenAPI inputs and writes RFC4180 CSV output."
+readme = "readme.md"
+requires-python = ">=3.10"
+authors = [{ name = "Valid Builder Team" }]
+dependencies = [
+    "ruamel.yaml>=0.17",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+valid-builder = "src.cli:main"
