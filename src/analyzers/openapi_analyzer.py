@@ -38,24 +38,26 @@ def analyze_openapi_file(path: str | Path) -> List[Rule]:
 
     # Process endpoints and request/response schemas
     paths_node = _get_mapping_node(root, "paths")
-    if paths_node:
-        for endpoint_path, endpoint_node in _iter_mapping(paths_node):
-            methods_node = endpoint_node
-            if not isinstance(methods_node.value, dict):
+    if paths_node is None or not isinstance(paths_node.value, dict):
+        raise OpenAPIAnalyzerError("OpenAPI document must contain a paths mapping")
+
+    for endpoint_path, endpoint_node in _iter_mapping(paths_node):
+        methods_node = endpoint_node
+        if not isinstance(methods_node.value, dict):
+            continue
+        for method, method_node in _iter_mapping(methods_node):
+            if method.lower() not in {"get", "post", "put", "delete", "patch"}:
                 continue
-            for method, method_node in _iter_mapping(methods_node):
-                if method.lower() not in {"get", "post", "put", "delete", "patch"}:
-                    continue
-                endpoint_str = f"{endpoint_path} [{method.upper()}]"
-                created, internal_id = _analyze_method(
-                    method_node,
-                    path.name,
-                    endpoint_str,
-                    schemas,
-                    internal_id,
-                    rules,
-                )
-                internal_id = created
+            endpoint_str = f"{endpoint_path} [{method.upper()}]"
+            created, internal_id = _analyze_method(
+                method_node,
+                path.name,
+                endpoint_str,
+                schemas,
+                internal_id,
+                rules,
+            )
+            internal_id = created
 
     return rules
 
