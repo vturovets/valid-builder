@@ -16,3 +16,6 @@ dependencies = [
 
 [project.scripts]
 valid-builder = "src.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["src"]
