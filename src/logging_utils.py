@@ -35,3 +35,46 @@ def setup_logging(log_level: str = "INFO", log_file: Optional[str] = None) -> lo
         logger.addHandler(file_handler)
 
     return logger
+
+
+class SummaryHandler(logging.Handler):
+    """Track warning and error counts for a run without emitting output."""
+
+    def __init__(self) -> None:
+        super().__init__(level=logging.WARNING)
+        self.warning_count = 0
+        self.error_count = 0
+
+    def emit(self, record: logging.LogRecord) -> None:  # pragma: no cover - trivial
+        if record.levelno >= logging.ERROR:
+            self.error_count += 1
+        elif record.levelno >= logging.WARNING:
+            self.warning_count += 1
+
+
+def attach_summary_handler(logger: logging.Logger) -> SummaryHandler:
+    """Attach a summary counter handler to the provided logger."""
+
+    handler = SummaryHandler()
+    logger.addHandler(handler)
+    return handler
+
+
+def log_final_summary(
+    logger: logging.Logger,
+    summary_handler: SummaryHandler | None,
+    *,
+    rule_count: int | None,
+    success: bool,
+) -> None:
+    """Log a final summary line with counts and overall status."""
+
+    warnings = summary_handler.warning_count if summary_handler else 0
+    errors = summary_handler.error_count if summary_handler else 0
+
+    if success:
+        count_text = f"Completed successfully. Extracted {rule_count or 0} rules."
+        warning_text = f"{warnings} warning(s)." if warnings else "No warnings."
+        logger.info("%s %s", count_text, warning_text)
+    else:
+        logger.error("Failed with %d error(s). See messages above.", errors or 1)
