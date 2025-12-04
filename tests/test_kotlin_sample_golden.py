@@ -22,7 +22,7 @@ def test_sample_kotlin_matches_expected_csv(tmp_path):
         "RULE-001,\"If the site region resolved from 'channel.siteID' equals 'wr' AND 'beneAdminFeesFeatureFlag' is true, "
         "then the request's (target, medium) must be validated against the configured channel mapping.\",RequestValidator_sample.kt,94-105,,,\n"
         "RULE-002,\"For region 'wr' with 'beneAdminFeesFeatureFlag' = true, the pair (target.lowercase(), medium.uppercase()) "
-        "must exist in 'channelConfig.targetToMediumMap'; otherwise the validator throws a ValidationException with ValidationProblem(title='Validation failed for Holiday Offers request', system='Holiday Offers', validationIssues=['Invalid channel mapping for target: <target> and medium: <medium>']).\",RequestValidator_sample.kt,103-120,,,RULE-001\n"
+        "must exist in 'channelConfig.targetToMediumMap'; otherwise the request is rejected with 'Invalid channel mapping for target: <target> and medium: <medium>'.\",RequestValidator_sample.kt,103-120,,,RULE-001\n"
     )
 
     assert output_path.read_text() == expected
